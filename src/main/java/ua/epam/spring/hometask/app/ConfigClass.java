@@ -3,6 +3,9 @@ package ua.epam.spring.hometask.app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import ua.epam.spring.hometask.aspect.CounterAspect;
+import ua.epam.spring.hometask.aspect.DiscountAspect;
+import ua.epam.spring.hometask.aspect.LuckyWinnerAspect;
 import ua.epam.spring.hometask.controller.MainController;
 import ua.epam.spring.hometask.dao.AuditoriumDAO;
 import ua.epam.spring.hometask.dao.EventDAO;
@@ -24,6 +27,7 @@ import java.util.*;
  */
 @Configuration
 @PropertySource("classpath:auditorium.properties")
+@EnableAspectJAutoProxy
 public class ConfigClass {
 
     @Autowired
@@ -164,5 +168,20 @@ public class ConfigClass {
     @Bean
     public View view() {
         return new View();
+    }
+
+    @Bean
+    public CounterAspect aspect() {
+        return new CounterAspect();
+    }
+
+    @Bean
+    public DiscountAspect discountAspect() {
+        return new DiscountAspect();
+    }
+
+    @Bean
+    public LuckyWinnerAspect winnerAspect() {
+        return new LuckyWinnerAspect();
     }
 }
