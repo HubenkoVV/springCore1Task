@@ -160,7 +160,7 @@ public class Event extends DomainObject {
         return rating;
     }
 
-    void setRating(EventRating rating) {
+    public void setRating(EventRating rating) {
         this.rating = rating;
     }
 
@@ -199,4 +199,12 @@ public class Event extends DomainObject {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "Event{" +
+                "name='" + name + '\'' +
+                ", basePrice=" + basePrice +
+                ", rating=" + rating +
+                '}';
+    }
 }

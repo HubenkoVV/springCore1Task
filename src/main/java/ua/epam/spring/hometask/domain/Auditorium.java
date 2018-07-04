@@ -18,7 +18,7 @@ public class Auditorium {
 
     private Set<Long> vipSeats = Collections.emptySet();
 
-    Auditorium() {
+    public Auditorium() {
     }
 
     /**
@@ -43,7 +43,7 @@ public class Auditorium {
         return numberOfSeats;
     }
 
-    void setNumberOfSeats(long numberOfSeats) {
+    public void setNumberOfSeats(long numberOfSeats) {
         this.numberOfSeats = numberOfSeats;
     }
 
@@ -55,7 +55,7 @@ public class Auditorium {
         return vipSeats;
     }
 
-    void setVipSeats(Set<Long> vipSeats) {
+    public void setVipSeats(Set<Long> vipSeats) {
         this.vipSeats = vipSeats;
     }
 
