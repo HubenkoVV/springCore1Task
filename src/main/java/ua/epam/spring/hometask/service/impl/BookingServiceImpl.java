@@ -35,7 +35,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         for (long seat : seats) {
-            if (event.getAuditoriums().ceilingEntry(dateTime).getValue().getVipSeats().contains(seat))
+            if (event.getAuditoriums().get(dateTime).getVipSeats().contains(seat))
                 price += 2 * event.getBasePrice();
             else price += event.getBasePrice();
         }
