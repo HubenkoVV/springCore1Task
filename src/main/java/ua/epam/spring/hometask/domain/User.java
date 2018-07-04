@@ -49,7 +49,7 @@ public class User extends DomainObject {
     }
 
     public void setTickets(NavigableSet<Ticket> tickets) {
-        this.tickets = tickets;
+        this.tickets.addAll(tickets);
     }
 
     public LocalDate getBirthday() {

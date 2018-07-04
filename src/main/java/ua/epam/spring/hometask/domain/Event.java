@@ -18,6 +18,15 @@ public class Event extends DomainObject {
     private EventRating rating;
 
     private NavigableMap<LocalDateTime, Auditorium> auditoriums = new TreeMap<>();
+    private NavigableMap<LocalDateTime, List<Ticket>> ticketsOnDate = new TreeMap<>();
+
+    public NavigableMap<LocalDateTime, List<Ticket>> getTicketsOnDate() {
+        return ticketsOnDate;
+    }
+
+    public void setTicketsOnDate(NavigableMap<LocalDateTime, List<Ticket>> ticketsOnDate) {
+        this.ticketsOnDate = ticketsOnDate;
+    }
 
     /**
      * Checks if event is aired on particular <code>dateTime</code> and assigns
