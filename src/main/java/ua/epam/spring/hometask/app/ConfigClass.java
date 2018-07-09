@@ -3,6 +3,8 @@ package ua.epam.spring.hometask.app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import ua.epam.spring.hometask.aspect.CounterAspect;
 import ua.epam.spring.hometask.aspect.DiscountAspect;
 import ua.epam.spring.hometask.aspect.LuckyWinnerAspect;
@@ -26,7 +28,10 @@ import java.util.*;
  * Created by Vladyslava_Hubenko on 7/3/2018.
  */
 @Configuration
-@PropertySource("classpath:auditorium.properties")
+@PropertySources({
+        @PropertySource("classpath:auditorium.properties"),
+        @PropertySource("classpath:db.properties")
+})
 @EnableAspectJAutoProxy
 public class ConfigClass {
 
@@ -37,12 +42,6 @@ public class ConfigClass {
     @Scope("prototype")
     public User user() {
         return new User();
-    }
-
-    @Bean
-    @Scope("prototype")
-    public Event event() {
-        return new Event();
     }
 
     @Bean
@@ -65,6 +64,21 @@ public class ConfigClass {
     }
 
     @Bean
+    public List<Auditorium> auditoriums() {
+        List<Auditorium> auditoriums = new ArrayList<>();
+        for (int i = 1; i < 6; i++) {
+            auditoriums.add(auditorium(i));
+        }
+        return auditoriums;
+    }
+
+    @Bean
+    @Scope("prototype")
+    public Event event() {
+        return new Event();
+    }
+
+    @Bean
     public List<Event> events() {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
@@ -81,11 +95,11 @@ public class ConfigClass {
 
     @Bean
     public NavigableSet<LocalDateTime> dates() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         NavigableSet<LocalDateTime> dateTimes = new TreeSet<>();
-        dateTimes.add(LocalDateTime.parse("2018-08-13 12:30", formatter));
-        dateTimes.add(LocalDateTime.parse("2018-08-14 12:30", formatter));
-        dateTimes.add(LocalDateTime.parse("2018-08-15 12:30", formatter));
+        dateTimes.add(LocalDateTime.parse("2018-08-13 12:30:00", formatter));
+        dateTimes.add(LocalDateTime.parse("2018-08-14 12:30:00", formatter));
+        dateTimes.add(LocalDateTime.parse("2018-08-15 12:30:00", formatter));
         return dateTimes;
     }
 
@@ -104,18 +118,31 @@ public class ConfigClass {
     }
 
     @Bean
-    public UserService userService() {
-        return new UserServiceImpl(userDAO());
-    }
-
-    @Bean
     public UserDAO userDAO() {
-        return new UserDAO();
+        return new UserDAO(template());
     }
 
     @Bean
     public EventDAO eventDAO() {
-        return new EventDAO();
+        EventDAO eventDAO = new EventDAO(template());
+        for (Event event : events()) {
+            eventDAO.addEvent(event);
+        }
+        return eventDAO;
+    }
+
+    @Bean
+    public AuditoriumDAO auditoriumDAO() {
+        AuditoriumDAO auditoriumDAO = new AuditoriumDAO(template());
+        for (Auditorium auditorium : auditoriums()) {
+            auditoriumDAO.addAuditorium(auditorium);
+        }
+        return auditoriumDAO;
+    }
+
+    @Bean
+    public UserService userService() {
+        return new UserServiceImpl(userDAO());
     }
 
     @Bean
@@ -124,16 +151,8 @@ public class ConfigClass {
     }
 
     @Bean
-    public AuditoriumDAO auditoriumDAO() {
-        List<Auditorium> auditoriums = new ArrayList<>();
-        for (int i = 1; i < 6; i++) {
-            auditoriums.add(auditorium(i));
-        }
-        return new AuditoriumDAO(auditoriums);
-    }
-
-    @Bean
     public AuditoriumService auditoriumService() {
+
         return new AuditoriumServiceImpl(auditoriumDAO());
     }
 
@@ -162,7 +181,7 @@ public class ConfigClass {
 
     @Bean
     public MainController controller() {
-        return new MainController(view(), new Scanner(System.in), userService());
+        return new MainController(new Scanner(System.in));
     }
 
     @Bean
@@ -183,5 +202,20 @@ public class ConfigClass {
     @Bean
     public LuckyWinnerAspect winnerAspect() {
         return new LuckyWinnerAspect();
+    }
+
+    @Bean
+    public JdbcTemplate template() {
+        return new JdbcTemplate(dataSource());
+    }
+
+    @Bean
+    public DriverManagerDataSource dataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(env.getProperty("jdbc.driver"));
+        dataSource.setUrl(env.getProperty("jdbc.url"));
+        dataSource.setUsername(env.getProperty("jdbc.user"));
+        dataSource.setPassword(env.getProperty("jdbc.password"));
+        return dataSource;
     }
 }
