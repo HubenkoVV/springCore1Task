@@ -1,60 +1,91 @@
 package ua.epam.spring.hometask.dao;
 
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.lang.Nullable;
 import ua.epam.spring.hometask.domain.Event;
 
-import java.time.LocalDate;
+import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Vladyslava_Hubenko on 7/3/2018.
  */
 public class EventDAO {
 
-    private static Map<Long, Event> eventMap;
+    private JdbcTemplate template;
 
-    public EventDAO() {
+    public EventDAO(JdbcTemplate template) {
+        this.template = template;
     }
 
-    public Event save(Event event) {
-        long id = event.getId();
-        if (!eventMap.containsKey(id)) {
-            id = Collections.max(eventMap.keySet()) + 1;
-            event.setId(id);
-        }
-        eventMap.put(id, event);
-        return event;
+    public Long addEvent(Event event) {
+
+        KeyHolder holder = new GeneratedKeyHolder();
+        template.update(new PreparedStatementCreator() {
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection)
+                    throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(
+                        "INSERT INTO event (name, basePrice, rating) VALUES (?,?,?)",
+                        Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, event.getName());
+                ps.setDouble(2, event.getBasePrice());
+                ps.setString(3, String.valueOf(event.getRating()));
+                return ps;
+            }
+        }, holder);
+
+        return holder.getKey().longValue();
     }
 
     public void remove(Event event) {
-        eventMap.remove(event.getId());
+        template.update("DELETE FROM event WHERE idevent = ?", event.getId());
     }
 
     public Event getById(long id) {
-        return eventMap.get(id);
+        return (Event) template.queryForObject("SELECT * FROM event WHERE idevent = ?",
+                new Object[]{id},
+                new BeanPropertyRowMapper(Event.class));
     }
 
-    public List<Event> getAll() {
-        return new ArrayList<>(eventMap.values());
+    public List getAll() {
+        return template.query("SELECT * FROM event",
+                new BeanPropertyRowMapper(Event.class));
     }
 
     public Event getByName(String name) {
-        Optional<Event> event = eventMap.values().stream().filter(item -> item.getName().equals(name)).findFirst();
-        return event.orElse(null);
+        return (Event) template.queryForObject("SELECT * FROM event WHERE name = ?",
+                new Object[]{name},
+                new BeanPropertyRowMapper(Event.class));
     }
 
 
-    public Set<Event> getForDateRange(LocalDate from, LocalDate to) {
-        Optional<Event> events = eventMap.values().stream().filter(event -> event.airsOnDates(from, to)).findAny();
-        return (Set<Event>) events.orElse(null);
+    public Set<Event> getForDateRange(LocalDateTime from, LocalDateTime to) {
+        List<Long> eventsId = getSeancesByDate(from, to);
+        Set<Event> events = new HashSet<>();
+        eventsId.forEach(id -> events.add(getById(id)));
+        return events;
     }
 
-    public Set<Event> getNextEvents(LocalDateTime to) {
-        Optional<Event> events = eventMap.values().stream().filter(event -> event.getAirDates().stream()
-                .anyMatch(dt -> dt.compareTo(LocalDateTime.now()) >= 0
-                        && dt.compareTo(to) <= 0)).findAny();
-        return (Set<Event>) events.orElse(null);
+    private List getSeancesByDate(LocalDateTime dateFrom, LocalDateTime dateTo) {
+        return template.query("SELECT event_id FROM seance WHERE " +
+                        "dateTime <= ? AND dateTime >= ? GROUP BY event_id",
+                new Object[]{dateTo, dateFrom},
+                new RowMapper<Long>() {
+                    @Nullable
+                    @Override
+                    public Long mapRow(ResultSet resultSet, int i) throws SQLException {
+                        return Long.valueOf(resultSet.getInt("event_id"));
+                    }
+                });
     }
-
-
 }
