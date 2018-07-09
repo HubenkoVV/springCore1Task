@@ -9,6 +9,7 @@ import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
 import ua.epam.spring.hometask.service.AuditoriumService;
 import ua.epam.spring.hometask.service.BookingService;
+import ua.epam.spring.hometask.service.EventService;
 import ua.epam.spring.hometask.service.UserService;
 import ua.epam.spring.hometask.view.View;
 
@@ -23,24 +24,26 @@ public class MainController {
 
     @Autowired
     private ApplicationContext appContext;
+    @Autowired
+    @Qualifier("view")
     private View view;
     private Scanner scanner;
     private User user;
-    private UserService userService;
     @Autowired
-    @Qualifier("events")
-    private List<Event> events;
+    @Qualifier("userService")
+    private UserService userService;
     @Autowired
     @Qualifier("auditoriumService")
     private AuditoriumService auditoriumService;
     @Autowired
     @Qualifier("bookingService")
     private BookingService bookingService;
+    @Autowired
+    @Qualifier("eventService")
+    private EventService eventService;
 
-    public MainController(View view, Scanner scanner, UserService userService) {
-        this.view = view;
+    public MainController(Scanner scanner) {
         this.scanner = scanner;
-        this.userService = userService;
     }
 
     public void menu() {
@@ -102,6 +105,7 @@ public class MainController {
     }
 
     private void showEvents() {
+        List<Event> events = (List<Event>) eventService.getAll();
         view.print(View.EVENTS);
         view.printList(events);
         view.print(View.CHOOSE_EV);
