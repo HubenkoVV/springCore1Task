@@ -6,6 +6,7 @@ import ua.epam.spring.hometask.service.AuditoriumService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.naming.OperationNotSupportedException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +19,22 @@ public class AuditoriumServiceImpl implements AuditoriumService {
 
     public AuditoriumServiceImpl(AuditoriumDAO auditoriumDAO) {
         this.auditoriumDAO = auditoriumDAO;
+    }
+
+    @Override
+    public Auditorium save(@Nonnull Auditorium object) {
+        object.setId(auditoriumDAO.addAuditorium(object));
+        return object;
+    }
+
+    @Override
+    public void remove(@Nonnull Auditorium object) throws OperationNotSupportedException {
+        throw new OperationNotSupportedException();
+    }
+
+    @Override
+    public Auditorium getById(@Nonnull Long id) throws OperationNotSupportedException {
+        throw new OperationNotSupportedException();
     }
 
     @Nonnull

@@ -23,7 +23,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event save(@Nonnull Event object) {
-        return eventDAO.save(object);
+        object.setId(eventDAO.addEvent(object));
+        return object;
     }
 
     @Override
@@ -52,13 +53,13 @@ public class EventServiceImpl implements EventService {
     @Nonnull
     @Override
     public Set<Event> getForDateRange(@Nonnull LocalDate from, @Nonnull LocalDate to) {
-        return eventDAO.getForDateRange(from, to);
+        return eventDAO.getForDateRange(from.atStartOfDay(), to.atStartOfDay());
     }
 
     @Nonnull
     @Override
     public Set<Event> getNextEvents(@Nonnull LocalDateTime to) {
-        return eventDAO.getNextEvents(to);
+        return eventDAO.getForDateRange(LocalDateTime.now(), to);
     }
 
 

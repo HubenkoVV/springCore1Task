@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * @author Yuriy_Tkach
  */
-public interface AuditoriumService {
+public interface AuditoriumService extends AbstractDomainObjectService<Auditorium> {
 
     /**
      * Getting all auditoriums from the system

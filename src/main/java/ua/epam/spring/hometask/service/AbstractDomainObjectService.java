@@ -3,6 +3,7 @@ package ua.epam.spring.hometask.service;
 import ua.epam.spring.hometask.domain.DomainObject;
 
 import javax.annotation.Nonnull;
+import javax.naming.OperationNotSupportedException;
 import java.util.Collection;
 
 /**
@@ -24,7 +25,7 @@ public interface AbstractDomainObjectService<T extends DomainObject> {
      *
      * @param object Object to remove
      */
-    void remove(@Nonnull T object);
+    void remove(@Nonnull T object) throws OperationNotSupportedException;
 
     /**
      * Getting object by id from storage
@@ -32,7 +33,7 @@ public interface AbstractDomainObjectService<T extends DomainObject> {
      * @param id id of the object
      * @return Found object or <code>null</code>
      */
-    T getById(@Nonnull Long id);
+    T getById(@Nonnull Long id) throws OperationNotSupportedException;
 
     /**
      * Getting all objects from storage
