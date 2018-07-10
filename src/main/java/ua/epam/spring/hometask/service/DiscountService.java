@@ -22,6 +22,7 @@ public interface DiscountService {
      * @param seats Seats that user buys
      * @return discount value from 0 to 100
      */
-    Double getDiscount(@Nullable User user, @Nonnull Event event, LocalDateTime date, @Nonnull Set<Long> seats);
+    Double getDiscount(@Nullable User user, @Nonnull Event event,
+                       LocalDateTime date, @Nonnull Set<Long> seats, Set<Long> vipSeats);
 
 }

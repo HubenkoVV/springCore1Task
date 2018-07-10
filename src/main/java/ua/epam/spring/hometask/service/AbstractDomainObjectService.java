@@ -1,7 +1,5 @@
 package ua.epam.spring.hometask.service;
 
-import ua.epam.spring.hometask.domain.DomainObject;
-
 import javax.annotation.Nonnull;
 import javax.naming.OperationNotSupportedException;
 import java.util.Collection;
@@ -10,7 +8,7 @@ import java.util.Collection;
  * @param <T> DomainObject subclass
  * @author Yuriy_Tkach
  */
-public interface AbstractDomainObjectService<T extends DomainObject> {
+public interface AbstractDomainObjectService<T> {
 
     /**
      * Saving new object to storage or updating existing one
@@ -33,7 +31,7 @@ public interface AbstractDomainObjectService<T extends DomainObject> {
      * @param id id of the object
      * @return Found object or <code>null</code>
      */
-    T getById(@Nonnull Long id) throws OperationNotSupportedException;
+    T getById(@Nonnull Long id);
 
     /**
      * Getting all objects from storage

@@ -28,4 +28,6 @@ public interface AuditoriumService extends AbstractDomainObjectService<Auditoriu
     @Nullable
     Auditorium getByName(@Nonnull String name);
 
+    Set<Long> getSeatsVIP(Auditorium auditorium);
+
 }
