@@ -11,5 +11,5 @@ import java.util.Set;
  */
 @FunctionalInterface
 public interface DiscountStrategy {
-    double getDiscount(User user, Set<Long> seats, Event event, LocalDateTime date);
+    double getDiscount(User user, Set<Long> seats, Event event, LocalDateTime date, Set<Long> vipSeats);
 }

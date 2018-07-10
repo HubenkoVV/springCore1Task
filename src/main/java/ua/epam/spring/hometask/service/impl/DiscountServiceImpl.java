@@ -25,9 +25,10 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public Double getDiscount(@Nullable User user, @Nonnull Event event, LocalDateTime date, @Nonnull Set<Long> seats) {
+    public Double getDiscount(@Nullable User user, @Nonnull Event event, LocalDateTime date,
+                              @Nonnull Set<Long> seats, Set<Long> vipSeats) {
         List<Double> discounts = new ArrayList<>();
-        strategies.forEach(strategies -> discounts.add(strategies.getDiscount(user, seats, event, date)));
+        strategies.forEach(strategies -> discounts.add(strategies.getDiscount(user, seats, event, date, vipSeats)));
         return Collections.max(discounts);
     }
 }

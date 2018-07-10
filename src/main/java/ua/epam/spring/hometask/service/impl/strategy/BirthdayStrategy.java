@@ -1,6 +1,5 @@
 package ua.epam.spring.hometask.service.impl.strategy;
 
-import ua.epam.spring.hometask.domain.Auditorium;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.User;
 
@@ -14,18 +13,18 @@ import java.util.Set;
 public class BirthdayStrategy implements DiscountStrategy {
 
     @Override
-    public double getDiscount(User user, Set<Long> seats, Event event, LocalDateTime date) {
+    public double getDiscount(User user, Set<Long> seats, Event event, LocalDateTime date, Set<Long> vipSeats) {
         if (user != null && user.getBirthday().getMonth() == LocalDate.now().getMonth()
                 && user.getBirthday().getDayOfMonth() == LocalDate.now().getDayOfMonth()) {
-            return discountForUser(event.getAuditoriums().get(date), seats, event.getBasePrice());
+            return discountForUser(vipSeats, seats, event.getBasePrice());
         }
         return 0;
     }
 
-    private double discountForUser(Auditorium auditorium, Set<Long> seats, double price) {
+    private double discountForUser(Set<Long> vipSeats, Set<Long> seats, double price) {
         double discount = 0;
         for (long seat : seats) {
-            if (auditorium.getVipSeats().contains(seat))
+            if (vipSeats.contains(seat))
                 discount += 2 * price * 0.05;
             else discount += price * 0.05;
         }
