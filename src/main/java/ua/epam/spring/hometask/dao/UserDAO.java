@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
 
 import java.sql.*;
@@ -44,7 +45,7 @@ public class UserDAO {
     }
 
     public void remove(User user) {
-        template.update("DELETE FROM user WHERE iduser = ?", user.getId());
+        template.update("DELETE FROM user WHERE iduser = ?", user.getIduser());
     }
 
     public User getById(long id) {
@@ -62,5 +63,11 @@ public class UserDAO {
         return (User) template.queryForObject("SELECT * FROM user WHERE email = ?",
                 new Object[]{name},
                 new BeanPropertyRowMapper(User.class));
+    }
+
+    public List<Ticket> getTickets(long id) {
+        return template.query("SELECT * FROM ticket WHERE user = ?",
+                new Object[]{id},
+                new BeanPropertyRowMapper(Ticket.class));
     }
 }

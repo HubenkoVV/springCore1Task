@@ -27,7 +27,6 @@ public class EventDAO {
     }
 
     public Long addEvent(Event event) {
-
         KeyHolder holder = new GeneratedKeyHolder();
         template.update(new PreparedStatementCreator() {
 
@@ -48,24 +47,25 @@ public class EventDAO {
     }
 
     public void remove(Event event) {
-        template.update("DELETE FROM event WHERE idevent = ?", event.getId());
+        template.update("DELETE FROM event WHERE idevent = ?", event.getIdevent());
     }
 
     public Event getById(long id) {
-        return (Event) template.queryForObject("SELECT * FROM event WHERE idevent = ?",
+        return template.queryForObject("SELECT * FROM event WHERE idevent = ?",
                 new Object[]{id},
-                new BeanPropertyRowMapper(Event.class));
+                new BeanPropertyRowMapper<>(Event.class));
     }
 
     public List getAll() {
-        return template.query("SELECT * FROM event",
-                new BeanPropertyRowMapper(Event.class));
+        List<Event> events = template.query("SELECT * FROM event",
+                new BeanPropertyRowMapper<>(Event.class));
+        return events;
     }
 
     public Event getByName(String name) {
-        return (Event) template.queryForObject("SELECT * FROM event WHERE name = ?",
+        return template.queryForObject("SELECT * FROM event WHERE name = ?",
                 new Object[]{name},
-                new BeanPropertyRowMapper(Event.class));
+                new BeanPropertyRowMapper<>(Event.class));
     }
 
 
@@ -76,7 +76,7 @@ public class EventDAO {
         return events;
     }
 
-    private List getSeancesByDate(LocalDateTime dateFrom, LocalDateTime dateTo) {
+    private List<Long> getSeancesByDate(LocalDateTime dateFrom, LocalDateTime dateTo) {
         return template.query("SELECT event_id FROM seance WHERE " +
                         "dateTime <= ? AND dateTime >= ? GROUP BY event_id",
                 new Object[]{dateTo, dateFrom},
@@ -87,5 +87,10 @@ public class EventDAO {
                         return Long.valueOf(resultSet.getInt("event_id"));
                     }
                 });
+    }
+
+    public void deleteAll() {
+        template.update("delete FROM event");
+
     }
 }
