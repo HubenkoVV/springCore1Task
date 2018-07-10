@@ -63,7 +63,7 @@ public class AuditoriumDAO {
         return id;
     }
 
-    private Set<Long> seatsVIP(long id) {
+    public Set<Long> seatsVIP(long id) {
         List<Long> seats = template.query("SELECT * FROM seat_vip WHERE auditor = ?",
                 new Object[]{id},
                 new RowMapper<Long>() {
@@ -74,6 +74,17 @@ public class AuditoriumDAO {
                     }
                 });
         return new HashSet<>(seats);
+    }
+
+    public void deleteAll() {
+        template.update("delete FROM seat_vip");
+        template.update("delete FROM auditorium");
+    }
+
+    public Auditorium getById(long id) {
+        return (Auditorium) template.queryForObject("SELECT * FROM auditorium WHERE idauditorium = ?",
+                new Object[]{id},
+                new BeanPropertyRowMapper(Auditorium.class));
     }
 
     /*private Auditorium getAuditorium(ResultSet resultSet) throws SQLException {
