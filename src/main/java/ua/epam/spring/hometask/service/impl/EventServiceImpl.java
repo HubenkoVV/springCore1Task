@@ -23,7 +23,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event save(@Nonnull Event object) {
-        object.setId(eventDAO.addEvent(object));
+        object.setIdevent(eventDAO.addEvent(object));
         return object;
     }
 

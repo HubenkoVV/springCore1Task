@@ -23,7 +23,7 @@ public class AuditoriumServiceImpl implements AuditoriumService {
 
     @Override
     public Auditorium save(@Nonnull Auditorium object) {
-        object.setId(auditoriumDAO.addAuditorium(object));
+        object.setIdauditorium(auditoriumDAO.addAuditorium(object));
         return object;
     }
 
@@ -33,8 +33,8 @@ public class AuditoriumServiceImpl implements AuditoriumService {
     }
 
     @Override
-    public Auditorium getById(@Nonnull Long id) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException();
+    public Auditorium getById(@Nonnull Long id) {
+        return auditoriumDAO.getById(id);
     }
 
     @Nonnull
@@ -47,5 +47,9 @@ public class AuditoriumServiceImpl implements AuditoriumService {
     @Override
     public Auditorium getByName(@Nonnull String name) {
         return auditoriumDAO.getByName(name);
+    }
+
+    public Set<Long> getSeatsVIP(Auditorium auditorium) {
+        return auditoriumDAO.seatsVIP(auditorium.getIdauditorium());
     }
 }

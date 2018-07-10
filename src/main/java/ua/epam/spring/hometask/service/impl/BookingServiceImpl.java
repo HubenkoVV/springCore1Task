@@ -23,9 +23,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public double getTicketsPrice(@Nonnull Event event, @Nonnull LocalDateTime dateTime, @Nullable User user, @Nonnull Set<Long> seats) {
+    public double getTicketsPrice(@Nonnull Event event, @Nonnull LocalDateTime dateTime, @Nullable User user,
+                                  @Nonnull Set<Long> seats, Set<Long> vipSeats) {
         int price = 0;
-        double discount = discountService.getDiscount(user, event, dateTime, seats);
+        double discount = discountService.getDiscount(user, event, dateTime, seats, vipSeats);
 
         switch (event.getRating()) {
             case MID:
@@ -35,7 +36,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         for (long seat : seats) {
-            if (event.getAuditoriums().get(dateTime).getVipSeats().contains(seat))
+            if (vipSeats.contains(seat))
                 price += 2 * event.getBasePrice();
             else price += event.getBasePrice();
         }
