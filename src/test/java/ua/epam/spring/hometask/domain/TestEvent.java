@@ -1,13 +1,5 @@
 package ua.epam.spring.hometask.domain;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static org.junit.Assert.*;
-
 /**
  * @author Yuriy_Tkach
  */
@@ -15,7 +7,7 @@ public class TestEvent {
 
     private Event event;
 
-    @Before
+    /*@Before
     public void initEvent() {
         event = new Event();
         event.setBasePrice(1.1);
@@ -108,5 +100,5 @@ public class TestEvent {
 
         assertTrue(event.getAuditoriums().isEmpty());
     }
-
+*/
 }
