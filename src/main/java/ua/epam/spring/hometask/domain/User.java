@@ -8,7 +8,9 @@ import java.util.TreeSet;
 /**
  * @author Yuriy_Tkach
  */
-public class User extends DomainObject {
+public class User {
+
+    private Long iduser;
 
     private String firstName;
 
@@ -19,6 +21,14 @@ public class User extends DomainObject {
     private LocalDate birthday;
 
     private NavigableSet<Ticket> tickets = new TreeSet<>();
+
+    public Long getIduser() {
+        return iduser;
+    }
+
+    public void setIduser(Long iduser) {
+        this.iduser = iduser;
+    }
 
     public String getFirstName() {
         return firstName;

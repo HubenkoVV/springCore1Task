@@ -1,13 +1,14 @@
 package ua.epam.spring.hometask.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 /**
  * @author Yuriy_Tkach
  */
-public class Event extends DomainObject {
+public class Event {
+
+    private Long idevent;
 
     private String name;
 
@@ -17,8 +18,17 @@ public class Event extends DomainObject {
 
     private EventRating rating;
 
-    private NavigableMap<LocalDateTime, Auditorium> auditoriums = new TreeMap<>();
+    private List<Seance> seances = new ArrayList<>();
+
     private NavigableMap<LocalDateTime, List<Ticket>> ticketsOnDate = new TreeMap<>();
+
+    public Long getIdevent() {
+        return idevent;
+    }
+
+    public void setIdevent(Long idevent) {
+        this.idevent = idevent;
+    }
 
     public NavigableMap<LocalDateTime, List<Ticket>> getTicketsOnDate() {
         return ticketsOnDate;
@@ -26,110 +36,6 @@ public class Event extends DomainObject {
 
     public void setTicketsOnDate(NavigableMap<LocalDateTime, List<Ticket>> ticketsOnDate) {
         this.ticketsOnDate = ticketsOnDate;
-    }
-
-    /**
-     * Checks if event is aired on particular <code>dateTime</code> and assigns
-     * auditorium to it.
-     *
-     * @param dateTime   Date and time of aired event for which to assign
-     * @param auditorium Auditorium that should be assigned
-     * @return <code>true</code> if successful, <code>false</code> if event is
-     * not aired on that date
-     */
-    boolean assignAuditorium(LocalDateTime dateTime, Auditorium auditorium) {
-        if (airDates.contains(dateTime)) {
-            auditoriums.put(dateTime, auditorium);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Removes auditorium assignment from event
-     *
-     * @param dateTime Date and time to remove auditorium for
-     * @return <code>true</code> if successful, <code>false</code> if not
-     * removed
-     */
-    boolean removeAuditoriumAssignment(LocalDateTime dateTime) {
-        return auditoriums.remove(dateTime) != null;
-    }
-
-    /**
-     * Add date and time of event air
-     *
-     * @param dateTime Date and time to add
-     * @return <code>true</code> if successful, <code>false</code> if already
-     * there
-     */
-    boolean addAirDateTime(LocalDateTime dateTime) {
-        return airDates.add(dateTime);
-    }
-
-    /**
-     * Adding date and time of event air and assigning auditorium to that
-     *
-     * @param dateTime   Date and time to add
-     * @param auditorium Auditorium to add if success in date time add
-     * @return <code>true</code> if successful, <code>false</code> if already
-     * there
-     */
-    boolean addAirDateTime(LocalDateTime dateTime, Auditorium auditorium) {
-        boolean result = airDates.add(dateTime);
-        if (result) {
-            auditoriums.put(dateTime, auditorium);
-        }
-        return result;
-    }
-
-    /**
-     * Removes the date and time of event air. If auditorium was assigned to
-     * that date and time - the assignment is also removed
-     *
-     * @param dateTime Date and time to remove
-     * @return <code>true</code> if successful, <code>false</code> if not there
-     */
-    boolean removeAirDateTime(LocalDateTime dateTime) {
-        boolean result = airDates.remove(dateTime);
-        if (result) {
-            auditoriums.remove(dateTime);
-        }
-        return result;
-    }
-
-    /**
-     * Checks if event airs on particular date and time
-     *
-     * @param dateTime Date and time to check
-     * @return <code>true</code> event airs on that date and time
-     */
-    boolean airsOnDateTime(LocalDateTime dateTime) {
-        return airDates.stream().anyMatch(dt -> dt.equals(dateTime));
-    }
-
-    /**
-     * Checks if event airs on particular date
-     *
-     * @param date Date to ckeck
-     * @return <code>true</code> event airs on that date
-     */
-    boolean airsOnDate(LocalDate date) {
-        return airDates.stream().anyMatch(dt -> dt.toLocalDate().equals(date));
-    }
-
-    /**
-     * Checking if event airs on dates between <code>from</code> and
-     * <code>to</code> inclusive
-     *
-     * @param from Start date to check
-     * @param to   End date to check
-     * @return <code>true</code> event airs on dates
-     */
-    public boolean airsOnDates(LocalDate from, LocalDate to) {
-        return airDates.stream()
-                .anyMatch(dt -> dt.toLocalDate().compareTo(from) >= 0 && dt.toLocalDate().compareTo(to) <= 0);
     }
 
     public String getName() {
@@ -164,12 +70,12 @@ public class Event extends DomainObject {
         this.rating = rating;
     }
 
-    public NavigableMap<LocalDateTime, Auditorium> getAuditoriums() {
-        return auditoriums;
+    public List<Seance> getSeances() {
+        return seances;
     }
 
-    public void setAuditoriums(NavigableMap<LocalDateTime, Auditorium> auditoriums) {
-        this.auditoriums = auditoriums;
+    public void setSeances(List<Seance> seances) {
+        this.seances = seances;
     }
 
     @Override

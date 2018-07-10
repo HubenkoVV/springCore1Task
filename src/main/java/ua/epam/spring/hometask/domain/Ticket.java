@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * @author Yuriy_Tkach
  */
-public class Ticket extends DomainObject implements Comparable<Ticket> {
+public class Ticket implements Comparable<Ticket> {
 
     private User user;
 
@@ -16,11 +16,21 @@ public class Ticket extends DomainObject implements Comparable<Ticket> {
 
     private long seat;
 
+    private Long idticket;
+
     public Ticket(User user, Event event, LocalDateTime dateTime, long seat) {
         this.user = user;
         this.event = event;
         this.dateTime = dateTime;
         this.seat = seat;
+    }
+
+    public Long getIdticket() {
+        return idticket;
+    }
+
+    public void setIdticket(Long idticket) {
+        this.idticket = idticket;
     }
 
     public User getUser() {
