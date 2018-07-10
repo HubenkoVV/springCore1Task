@@ -7,10 +7,7 @@ import ua.epam.spring.hometask.domain.Auditorium;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
-import ua.epam.spring.hometask.service.AuditoriumService;
-import ua.epam.spring.hometask.service.BookingService;
-import ua.epam.spring.hometask.service.EventService;
-import ua.epam.spring.hometask.service.UserService;
+import ua.epam.spring.hometask.service.*;
 import ua.epam.spring.hometask.view.View;
 
 import java.time.LocalDate;
@@ -41,6 +38,9 @@ public class MainController {
     @Autowired
     @Qualifier("eventService")
     private EventService eventService;
+    @Autowired
+    @Qualifier("seanceService")
+    private SeanceService seanceService;
 
     public MainController(Scanner scanner) {
         this.scanner = scanner;
@@ -112,10 +112,10 @@ public class MainController {
         Event event = events.get(scanner.nextInt() - 1);
 
         view.print(View.DATES);
-        view.printList(event.getAirDates());
+        view.printList(seanceService.getDatesForEvent(event.getIdevent()));
         view.print(View.CHOOSE_DATE);
         int indexDate = scanner.nextInt();
-        Iterator<LocalDateTime> iterator = event.getAirDates().iterator();
+        Iterator<LocalDateTime> iterator = seanceService.getDatesForEvent(event.getIdevent()).iterator();
         LocalDateTime dateTime = null;
         while (indexDate != 0) {
             dateTime = iterator.next();
@@ -126,18 +126,22 @@ public class MainController {
     }
 
     private void showTickets() {
-        if (user.getTickets().size() == 0) {
+        if (userService.getTickets(user).isEmpty()) {
             view.print(View.NO_TICKETS);
         } else {
             view.print(View.TICKETS);
-            view.printList(user.getTickets());
+            view.printList(userService.getTickets(user));
         }
     }
 
     private void buyTickets(Event event, LocalDateTime dateTime) {
         Set<Long> seats = chooseSeats(event, dateTime);
         view.print(View.PRICE);
-        view.printMessages(String.valueOf(bookingService.getTicketsPrice(event, dateTime, user, seats)));
+        Auditorium auditorium = auditoriumService.getById(
+                seanceService.getAuditorimForEventByDate(event.getIdevent(), dateTime));
+        view.printMessages(String.valueOf(bookingService
+                .getTicketsPrice(event, dateTime, user, seats,
+                        auditoriumService.getSeatsVIP(auditorium))));
         Set<Ticket> tickets = new HashSet<>();
         seats.forEach(seat -> tickets.add((Ticket) appContext.getBean("ticket", user, event, dateTime, seat)));
         bookingService.bookTickets(tickets);
@@ -145,10 +149,11 @@ public class MainController {
 
     private Set<Long> chooseSeats(Event event, LocalDateTime dateTime) {
         view.print(View.AUDITORIUM, View.CHOOSE_SEAT);
-        Auditorium auditorium = auditoriumService.getByName(event.getAuditoriums().get(dateTime).getName());
+        Auditorium auditorium = auditoriumService.getById(
+                seanceService.getAuditorimForEventByDate(event.getIdevent(), dateTime));
         view.printMessages(String.valueOf(auditorium.getNumberOfSeats()));
         view.print(View.VIP);
-        view.printList(auditorium.getVipSeats());
+        view.printList(auditoriumService.getSeatsVIP(auditorium));
         view.print(View.EXIT);
 
         Set<Long> seats = new HashSet<>();

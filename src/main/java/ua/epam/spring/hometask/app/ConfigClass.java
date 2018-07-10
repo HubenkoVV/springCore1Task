@@ -11,6 +11,7 @@ import ua.epam.spring.hometask.aspect.LuckyWinnerAspect;
 import ua.epam.spring.hometask.controller.MainController;
 import ua.epam.spring.hometask.dao.AuditoriumDAO;
 import ua.epam.spring.hometask.dao.EventDAO;
+import ua.epam.spring.hometask.dao.SeanceDAO;
 import ua.epam.spring.hometask.dao.UserDAO;
 import ua.epam.spring.hometask.domain.*;
 import ua.epam.spring.hometask.service.*;
@@ -64,10 +65,13 @@ public class ConfigClass {
     }
 
     @Bean
+    @DependsOn(value = "auditoriumDAO")
     public List<Auditorium> auditoriums() {
         List<Auditorium> auditoriums = new ArrayList<>();
         for (int i = 1; i < 6; i++) {
-            auditoriums.add(auditorium(i));
+            Auditorium auditorium = auditorium(i);
+            auditorium.setIdauditorium(auditoriumDAO().addAuditorium(auditorium));
+            auditoriums.add(auditorium);
         }
         return auditoriums;
     }
@@ -76,21 +80,6 @@ public class ConfigClass {
     @Scope("prototype")
     public Event event() {
         return new Event();
-    }
-
-    @Bean
-    public List<Event> events() {
-        List<Event> events = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            Event event = event();
-            event.setName("SMTH");
-            event.setBasePrice(73);
-            event.setAirDates(dates());
-            event.setAuditoriums(auditoriumsForDate(dates()));
-            event.setRating(EventRating.LOW);
-            events.add(event);
-        }
-        return events;
     }
 
     @Bean
@@ -104,17 +93,31 @@ public class ConfigClass {
     }
 
     @Bean
-    @DependsOn(value = "auditoriumDAO")
-    public NavigableMap<LocalDateTime, Auditorium> auditoriumsForDate(NavigableSet<LocalDateTime> dateTimes) {
-        NavigableMap<LocalDateTime, Auditorium> auditoriumsForDate = new TreeMap<>();
-        List<Auditorium> auditoriums = auditoriumDAO().getAll();
+    @Scope("prototype")
+    public Seance seance(LocalDateTime date, Long event, Long auditorium) {
+        Seance seance = new Seance();
+        seance.setAuditorium(auditorium);
+        seance.setDateTime(date);
+        seance.setEvent(event);
+        return seance;
+    }
+
+    @Bean
+    @Scope("prototype")
+    @DependsOn(value = {"seanceDAO", "auditoriumDAO"})
+    public List<Seance> seances(NavigableSet<LocalDateTime> dateTimes, Long idEvent) {
+        List<Seance> seances = new ArrayList<>();
+        List<Auditorium> auditoriums = auditoriums();
         Iterator<LocalDateTime> localDateTimeIterator = dateTimes.iterator();
         int i = 0;
         while (localDateTimeIterator.hasNext()) {
-            auditoriumsForDate.put(localDateTimeIterator.next(), auditoriums.get(i));
+            Seance seance = seance(localDateTimeIterator.next(), idEvent, auditoriums.get(i).getIdauditorium());
+            seances.add(seance);
             i++;
         }
-        return auditoriumsForDate;
+
+        seances.forEach(seance -> seanceDAO().addSeance(seance));
+        return seances;
     }
 
     @Bean
@@ -125,19 +128,38 @@ public class ConfigClass {
     @Bean
     public EventDAO eventDAO() {
         EventDAO eventDAO = new EventDAO(template());
-        for (Event event : events()) {
-            eventDAO.addEvent(event);
+        eventDAO.deleteAll();
+
+        List<Event> events = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            Event event = event();
+            event.setName("SMTH" + ".." + i + "..");
+            event.setBasePrice(73);
+            event.setAirDates(dates());
+            event.setRating(EventRating.LOW);
+            event.setIdevent(eventDAO.addEvent(event));
+            events.add(event);
+        }
+
+        for (Event event : events) {
+            seances(dates(), event.getIdevent());
         }
         return eventDAO;
     }
 
     @Bean
+    @DependsOn(value = "seanceDAO")
     public AuditoriumDAO auditoriumDAO() {
         AuditoriumDAO auditoriumDAO = new AuditoriumDAO(template());
-        for (Auditorium auditorium : auditoriums()) {
-            auditoriumDAO.addAuditorium(auditorium);
-        }
+        auditoriumDAO.deleteAll();
         return auditoriumDAO;
+    }
+
+    @Bean
+    public SeanceDAO seanceDAO() {
+        SeanceDAO seanceDAO = new SeanceDAO(template());
+        seanceDAO.deleteAll();
+        return seanceDAO;
     }
 
     @Bean
@@ -167,6 +189,11 @@ public class ConfigClass {
         strategyList.add(birth());
         strategyList.add(tenth());
         return new DiscountServiceImpl(strategyList);
+    }
+
+    @Bean
+    public SeanceService seanceService() {
+        return new SeanceServiceImpl(seanceDAO());
     }
 
     @Bean
