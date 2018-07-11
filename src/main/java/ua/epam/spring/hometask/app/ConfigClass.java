@@ -9,10 +9,7 @@ import ua.epam.spring.hometask.aspect.CounterAspect;
 import ua.epam.spring.hometask.aspect.DiscountAspect;
 import ua.epam.spring.hometask.aspect.LuckyWinnerAspect;
 import ua.epam.spring.hometask.controller.MainController;
-import ua.epam.spring.hometask.dao.AuditoriumDAO;
-import ua.epam.spring.hometask.dao.EventDAO;
-import ua.epam.spring.hometask.dao.SeanceDAO;
-import ua.epam.spring.hometask.dao.UserDAO;
+import ua.epam.spring.hometask.dao.*;
 import ua.epam.spring.hometask.domain.*;
 import ua.epam.spring.hometask.service.*;
 import ua.epam.spring.hometask.service.impl.*;
@@ -47,8 +44,8 @@ public class ConfigClass {
 
     @Bean
     @Scope("prototype")
-    public Ticket ticket(User user, Event event, LocalDateTime dateTime, long seat) {
-        return new Ticket(user, event, dateTime, seat);
+    public Ticket ticket(User user, Long seance, long seat) {
+        return new Ticket(user, seance, seat);
     }
 
     @Bean
@@ -163,8 +160,13 @@ public class ConfigClass {
     }
 
     @Bean
+    public TicketDAO ticketDAO() {
+        return new TicketDAO(template());
+    }
+
+    @Bean
     public UserService userService() {
-        return new UserServiceImpl(userDAO());
+        return new UserServiceImpl(userDAO(), ticketDAO());
     }
 
     @Bean
@@ -180,7 +182,7 @@ public class ConfigClass {
 
     @Bean
     public BookingService bookingService() {
-        return new BookingServiceImpl(discountService());
+        return new BookingServiceImpl(discountService(), ticketDAO());
     }
 
     @Bean
@@ -193,7 +195,7 @@ public class ConfigClass {
 
     @Bean
     public SeanceService seanceService() {
-        return new SeanceServiceImpl(seanceDAO());
+        return new SeanceServiceImpl(seanceDAO(), ticketDAO());
     }
 
     @Bean
