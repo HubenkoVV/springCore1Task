@@ -143,7 +143,9 @@ public class MainController {
                 .getTicketsPrice(event, dateTime, user, seats,
                         auditoriumService.getSeatsVIP(auditorium))));
         Set<Ticket> tickets = new HashSet<>();
-        seats.forEach(seat -> tickets.add((Ticket) appContext.getBean("ticket", user, event, dateTime, seat)));
+        seats.forEach(seat -> tickets.add((Ticket)
+                appContext.getBean("ticket", user,
+                        seanceService.getByEventAndDate(event, dateTime).getIdseance(), seat)));
         bookingService.bookTickets(tickets);
     }
 
