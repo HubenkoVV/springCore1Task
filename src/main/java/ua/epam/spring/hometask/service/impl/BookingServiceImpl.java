@@ -1,5 +1,6 @@
 package ua.epam.spring.hometask.service.impl;
 
+import ua.epam.spring.hometask.dao.TicketDAO;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
@@ -9,7 +10,8 @@ import ua.epam.spring.hometask.service.DiscountService;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Vladyslava_Hubenko on 7/3/2018.
@@ -17,9 +19,11 @@ import java.util.*;
 public class BookingServiceImpl implements BookingService {
 
     private DiscountService discountService;
+    private TicketDAO ticketDAO;
 
-    public BookingServiceImpl(DiscountService discountService) {
+    public BookingServiceImpl(DiscountService discountService, TicketDAO ticketDAO) {
         this.discountService = discountService;
+        this.ticketDAO = ticketDAO;
     }
 
     @Override
@@ -46,24 +50,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void bookTickets(@Nonnull Set<Ticket> tickets) {
-        List<Ticket> ticketList = new ArrayList<>();
-        ticketList.addAll(tickets);
-
-        Ticket first = tickets.iterator().next();
-        Event event = first.getEvent();
-
-        NavigableMap<LocalDateTime, List<Ticket>> ticketMap = new TreeMap<>();
-        ticketMap.put(first.getDateTime(), ticketList);
-        event.setTicketsOnDate(ticketMap);
-
-        if (first.getUser() != null) {
-            first.getUser().setTickets(new TreeSet<>(tickets));
-        }
+        tickets.forEach(ticket -> ticketDAO.addTicket(ticket));
     }
 
     @Nonnull
     @Override
     public List<Ticket> getPurchasedTicketsForEvent(@Nonnull Event event, @Nonnull LocalDateTime dateTime) {
-        return event.getTicketsOnDate().get(dateTime);
+        return ticketDAO.getForEvent(event.getIdevent());
+    }
+
+    @Override
+    public List<Ticket> getAllTickets() {
+        return ticketDAO.getAll();
     }
 }

@@ -49,6 +49,7 @@ public class AuditoriumServiceImpl implements AuditoriumService {
         return auditoriumDAO.getByName(name);
     }
 
+    @Override
     public Set<Long> getSeatsVIP(Auditorium auditorium) {
         return auditoriumDAO.seatsVIP(auditorium.getIdauditorium());
     }

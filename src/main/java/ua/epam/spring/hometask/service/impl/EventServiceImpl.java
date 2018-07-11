@@ -53,13 +53,13 @@ public class EventServiceImpl implements EventService {
     @Nonnull
     @Override
     public Set<Event> getForDateRange(@Nonnull LocalDate from, @Nonnull LocalDate to) {
-        return eventDAO.getForDateRange(from.atStartOfDay(), to.atStartOfDay());
+        return eventDAO.getEventForDateRange(from.atStartOfDay(), to.atStartOfDay());
     }
 
     @Nonnull
     @Override
     public Set<Event> getNextEvents(@Nonnull LocalDateTime to) {
-        return eventDAO.getForDateRange(LocalDateTime.now(), to);
+        return eventDAO.getEventForDateRange(LocalDateTime.now(), to);
     }
 
 

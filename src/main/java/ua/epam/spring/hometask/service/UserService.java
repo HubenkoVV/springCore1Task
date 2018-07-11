@@ -1,5 +1,6 @@
 package ua.epam.spring.hometask.service;
 
+import ua.epam.spring.hometask.domain.Seance;
 import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
 
@@ -22,5 +23,7 @@ public interface UserService extends AbstractDomainObjectService<User> {
     User getUserByEmail(@Nonnull String email);
 
     List<Ticket> getTickets(User user);
+
+    List<Ticket> getTicketsBySeance(User user, Seance seance);
 
 }

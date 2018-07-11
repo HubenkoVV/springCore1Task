@@ -1,6 +1,8 @@
 package ua.epam.spring.hometask.service.impl;
 
+import ua.epam.spring.hometask.dao.TicketDAO;
 import ua.epam.spring.hometask.dao.UserDAO;
+import ua.epam.spring.hometask.domain.Seance;
 import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
 import ua.epam.spring.hometask.service.UserService;
@@ -16,9 +18,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private UserDAO userDAO;
+    private TicketDAO ticketDAO;
 
-    public UserServiceImpl(UserDAO userDAO) {
+    public UserServiceImpl(UserDAO userDAO, TicketDAO ticketDAO) {
         this.userDAO = userDAO;
+        this.ticketDAO = ticketDAO;
     }
 
     @Nullable
@@ -49,7 +53,13 @@ public class UserServiceImpl implements UserService {
         return userDAO.getAll();
     }
 
+    @Override
     public List<Ticket> getTickets(User user) {
-        return userDAO.getTickets(user.getIduser());
+        return ticketDAO.getForUser(user.getIduser());
+    }
+
+    @Override
+    public List<Ticket> getTicketsBySeance(User user, Seance seance) {
+        return ticketDAO.getForUserBySeance(user.getIduser(), seance.getIdseance());
     }
 }

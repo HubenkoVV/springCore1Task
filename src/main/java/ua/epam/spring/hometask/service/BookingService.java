@@ -47,4 +47,6 @@ public interface BookingService {
     @Nonnull
     List<Ticket> getPurchasedTicketsForEvent(@Nonnull Event event, @Nonnull LocalDateTime dateTime);
 
+    List<Ticket> getAllTickets();
+
 }
