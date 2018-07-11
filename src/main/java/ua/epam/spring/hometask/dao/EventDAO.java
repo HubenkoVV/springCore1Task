@@ -69,17 +69,10 @@ public class EventDAO {
     }
 
 
-    public Set<Event> getForDateRange(LocalDateTime from, LocalDateTime to) {
-        List<Long> eventsId = getSeancesByDate(from, to);
-        Set<Event> events = new HashSet<>();
-        eventsId.forEach(id -> events.add(getById(id)));
-        return events;
-    }
-
-    private List<Long> getSeancesByDate(LocalDateTime dateFrom, LocalDateTime dateTo) {
-        return template.query("SELECT event_id FROM seance WHERE " +
+    public Set<Event> getEventForDateRange(LocalDateTime from, LocalDateTime to) {
+        List<Long> eventsId = template.query("SELECT event_id FROM seance WHERE " +
                         "dateTime <= ? AND dateTime >= ? GROUP BY event_id",
-                new Object[]{dateTo, dateFrom},
+                new Object[]{to, from},
                 new RowMapper<Long>() {
                     @Nullable
                     @Override
@@ -87,6 +80,9 @@ public class EventDAO {
                         return Long.valueOf(resultSet.getInt("event_id"));
                     }
                 });
+        Set<Event> events = new HashSet<>();
+        eventsId.forEach(id -> events.add(getById(id)));
+        return events;
     }
 
     public void deleteAll() {

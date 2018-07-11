@@ -70,4 +70,9 @@ public class UserDAO {
                 new Object[]{id},
                 new BeanPropertyRowMapper(Ticket.class));
     }
+
+    public void deleteAll() {
+        template.update("delete FROM seat_vip");
+        template.update("delete FROM auditorium");
+    }
 }

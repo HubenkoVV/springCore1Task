@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
+import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Seance;
 
 import java.sql.Date;
@@ -41,6 +42,12 @@ public class SeanceDAO {
                 new BeanPropertyRowMapper<>(Seance.class));
     }
 
+    public List getAllForEvent(Long id) {
+        return template.query("SELECT * FROM seance WHERE event_id = ?",
+                new Object[]{id},
+                new BeanPropertyRowMapper<>(Seance.class));
+    }
+
 
     public List<LocalDateTime> getDatesForEvent(Long id) {
         return template.query("SELECT dateTime FROM seance WHERE event_id = ?",
@@ -67,5 +74,13 @@ public class SeanceDAO {
                         return resultSet.getLong("auditorium_id");
                     }
                 });
+    }
+
+    public Seance getByEventAndDate(Event event, LocalDateTime dateTime) {
+        long millis = dateTime.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli();
+        Date date = new Date(millis);
+        return template.queryForObject("SELECT * FROM seance WHERE event_id = ? AND dateTime = ?",
+                new Object[]{event.getIdevent(), date},
+                new BeanPropertyRowMapper<>(Seance.class));
     }
 }
